@@ -6,27 +6,29 @@ import { useParams } from 'react-router-dom'
 import { LivrosService } from '../../api/LivrosService'
 
 const LivrosEdicao = () => {  
-  let {livroId} = useParams();
+  let {bookId} = useParams();
+
+  console.log(bookId)
 
   const [livro, setLivro] = useState([])
 
   async function getLivro(){
-    const {data} = await LivrosService.getLivro(livroId);
+    const {data} = await LivrosService.getLivro(bookId);
     setLivro(data)
   }
 
   async function editLivro(){
     const body = {
-        id:Number(livro.id),
-        titulo:livro.titulo,
-        num_paginas: Number(livro.num_paginas),
-        isbn: livro.isbn,
-        editora: livro.editora
+        title:livro.titulo,
+        pages: Number(livro.num_paginas),
+        ISBN: livro.isbn,
+        publishing: livro.editora
       }
-    if(livro.id!=undefined && livro.id!='' && livro.titulo!=undefined && livro.titulo!='' && livro.num_paginas!=undefined && livro.num_paginas!='' && livro.isbn !=undefined && livro.isbn !='' && livro.editora !=undefined && livro.editora !=''){
-      await LivrosService.updateLivro(Number(livro.id),body)
+    if(livro.titulo!=undefined && livro.titulo!='' && livro.num_paginas!=undefined && livro.num_paginas!='' && livro.isbn !=undefined && livro.isbn !='' && livro.editora !=undefined && livro.editora !=''){
+      await LivrosService.updateLivro(livro._id,body)
       .then(({data})=>{
-        alert(data.mensagem)
+        console.log(data)
+        alert(data[1].message)
       })
       .catch(({response:{data,status}})=>{
         alert(`${status} - ${data}`)      
@@ -46,11 +48,9 @@ const LivrosEdicao = () => {
     <div className='livrosCadastro'>
         <h1>Edição de Livros</h1>
         <div>
-          <form id="formulario">
-            <div className='form-group'>
-              <label>Id</label>
-              <input type="text" disabled required onChange={(event)=>{ setLivro({...livro, id: event.target.value})}} value={livro.id || ''}></input>
-            </div>
+          <form id="formulario" onSubmit={e => {
+            e.preventDefault()
+          }}>            
             <div className='form-group'>
               <label>Titulo</label>
               <input type="text" required onChange={(event)=>{ setLivro({...livro, titulo: event.target.value})}} value={livro.titulo || ''} ></input>
